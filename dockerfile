@@ -5,25 +5,26 @@
 #
 
 # Pull base image.
-FROM dockerfile/python
+FROM dockerfile/ubuntu
 
-# Install Node.js
+# Install Nginx.
 RUN \
-  cd /tmp && \
-  wget http://nodejs.org/dist/node-latest.tar.gz && \
-  tar xvzf node-latest.tar.gz && \
-  rm -f node-latest.tar.gz && \
-  cd node-v* && \
-  ./configure && \
-  CXX="g++ -Wno-unused-local-typedefs" make && \
-  CXX="g++ -Wno-unused-local-typedefs" make install && \
-  cd /tmp && \
-  rm -rf /tmp/node-v* && \
-  npm install -g npm && \
-  printf '\n# Node.js\nexport PATH="node_modules/.bin:$PATH"' >> /root/.bashrc
+  add-apt-repository -y ppa:nginx/stable && \
+  apt-get update && \
+  apt-get install -y nginx && \
+  rm -rf /var/lib/apt/lists/* && \
+  echo "\ndaemon off;" >> /etc/nginx/nginx.conf && \
+  chown -R www-data:www-data /var/lib/nginx
+
+# Define mountable directories.
+VOLUME ["/etc/nginx/sites-enabled", "/etc/nginx/certs", "/etc/nginx/conf.d", "/var/log/nginx", "/var/www/html"]
 
 # Define working directory.
-WORKDIR /data
+WORKDIR /etc/nginx
 
 # Define default command.
-CMD ["bash"]
+CMD ["nginx"]
+
+# Expose ports.
+EXPOSE 80
+EXPOSE 443
