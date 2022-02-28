@@ -4,7 +4,7 @@
 # https://github.com/dockerfile/nodejs
 
 # pull base image
-FROM dockerfile/python
+FROM ubuntu
 
 # Install Node.js
 RUN \
